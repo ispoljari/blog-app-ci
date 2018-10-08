@@ -1,7 +1,7 @@
 # blog-app
 
 ## Description
-- A simple RESTful API  implemented on a NodeJS server and hosted on Heroku. 
+- A simple RESTful API running on a NodeJS server and hosted on Heroku. 
 
 - No frontend code.
 
