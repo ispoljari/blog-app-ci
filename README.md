@@ -5,6 +5,6 @@
 
 - No frontend code.
 
-- Data is stored in a MongoDB database hosted on mLAB. 
+- Data is stored in a MongoDB database and hosted on mLAB. 
 
 - The API is performing CRUD operations through an ORM layer implemented in Mongoose.
