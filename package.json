@@ -1,0 +1,32 @@
+{
+  "name": "blog-app",
+  "version": "1.0.0",
+  "description": "RESTful API with ORM layer in mongoose",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha --exit",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ispoljari/blog-api-mongoose.git"
+  },
+  "keywords": [
+    "api",
+    "nodejs",
+    "expressjs",
+    "restful",
+    "mongoDB",
+    "mongoose",
+    "heroku"
+  ],
+  "author": "Ivan Spoljaric",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ispoljari/blog-api-mongoose/issues"
+  },
+  "homepage": "https://github.com/ispoljari/blog-api-mongoose#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
