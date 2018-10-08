@@ -40,15 +40,22 @@ router.get('/:id', (req, res) => {
 
 // CREATE post
 
-router.post('/', (req, res) => {
-  const requiredFields = ['title', 'content', 'author'];
-  requiredFields.forEach(field => {
-    if(!(field in req.body)) {
-      const message = `Missing \`${field}\` in request body`;
+function validateRequiredFields(req, res, requiredFields, location) {
+  for (let i=0; i<requiredFields.length; i++) {
+    if(!(requiredFields[i] in location)) {
+      const message = `The required field ${requiredFields[i]} is missing from the request body`
       console.error(message);
-      return res.status(400).send(message);
+      res.status(400).send(message);
     }
-  });
+  }
+}
+
+router.post('/', (req, res) => {
+  // check if all of the required fields are sent in the request
+  validateRequiredFields(req, res, ['title', 'content', 'author'], req.body);
+
+  // check if the author field contains the first and last name
+  validateRequiredFields(req, res, ['firstName', 'lastName'], req.body.author);
 
   Post.create({
     title: req.body.title,
@@ -66,5 +73,11 @@ router.post('/', (req, res) => {
     res.status(500).json({message: 'Internal server error!'});
   })
 });
+
+// UPDATE posts
+router.put('/:id', (req, res) => {
+// some code
+});
+
 
 module.exports = router;
