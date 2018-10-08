@@ -16,13 +16,109 @@ mongoose.Promise = global.Promise;
 // import constants from config.js
 const {DATABASE_URL, PORT} = require('./config');
 
-// run server
+let server;
 
-function runServer() {
+// setup a simple GET endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({hello: 'world'});
+});
 
+// run server function
+
+function runServer(databaseUrl, port = PORT) {
+ return new Promise((resolve, reject) => {
+  mongoose.connect(databaseUrl, err => {
+    if (err) {
+      return reject(err);
+    }
+    server = app
+      .listen(port, () => {
+        console.log(`Your app is listening on port ${port}`);
+        resolve();
+      })
+      .on('error', err => {
+        mongoose.disconnect();
+        reject(err);
+      });
+  });
+ });
 }
 
-// close server
 
+// alternate way of starting the server
+
+// function runServer(databaseUrl, port = PORT) {
+//   return new Promise((resolve, reject) => {
+//    mongoose.connect(databaseUrl, err => {
+//      if (err) {
+//        return reject(err);
+//      }
+//      resolve();
+//    });
+//   })
+//   .then(() => {
+//     server = app
+//     .listen(port, () => {
+//       console.log(`Your app is listening on port ${port}`);
+//     })
+//   },
+//   err => {
+//     mongoose.disconnect();
+//   });
+// }
+
+
+// close server
+function closeServer() {
+  return mongoose.disconnect().then(()=> {
+    return new Promise((resolve, reject) => {
+      server.close(err => {
+        if (err) {
+          return reject(err);
+        }
+        console.log('Closing server!');
+        resolve();
+      })
+    })
+  });
+}
+
+// alternate way 1 of closing the server
+
+// function closeS1() {
+//   return new Promise((resolve, reject) => {
+//     mongoose.disconnect(() => {
+//       server.close(err => {
+//         if (err) {
+//           return reject(err);
+//         }
+//         console.log('Closing server!');
+//         resolve();
+//       })
+//     }); 
+//   });
+// }
+
+// alternate way 2 of closing the server
+
+// function closeS2() {
+//   return new Promise((resolve, reject) => {
+//     mongoose.disconnect((err) => {
+//         if (err) {
+//           return reject(err);
+//         }
+//         resolve();
+//       })
+//       .then(()=> {
+//         server.close();
+//       },
+//       (err) => {
+//         console.error('There has been an error.');
+//       });
+//   });
+// }
 
 // start from the terminal
+if (require.main === module) {
+  runServer(DATABASE_URL).catch(err => console.error(err));
+}
