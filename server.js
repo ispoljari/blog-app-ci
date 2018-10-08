@@ -13,6 +13,9 @@ const mongoose = require('mongoose');
 // use native ES6 promises with mongoose
 mongoose.Promise = global.Promise;
 
+// import constants from config.js
+const {DATABASE_URL, PORT} = require('./config');
+
 // run server
 
 function runServer() {
