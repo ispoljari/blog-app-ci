@@ -13,15 +13,19 @@ const mongoose = require('mongoose');
 // use native ES6 promises with mongoose
 mongoose.Promise = global.Promise;
 
+// import router
+const blogRouter = require('./routes/blogRouter');
+
 // import constants from config.js
 const {DATABASE_URL, PORT} = require('./config');
 
-let server;
+// add body parsing middleware
+app.use(express.json());
 
-// setup a simple GET endpoint
-app.get('/', (req, res) => {
-  res.status(200).json({hello: 'world'});
-});
+// route requests
+app.use('/posts', blogRouter);
+
+let server;
 
 // run server function
 
@@ -44,30 +48,6 @@ function runServer(databaseUrl, port = PORT) {
  });
 }
 
-
-// alternate way of starting the server
-
-// function runServer(databaseUrl, port = PORT) {
-//   return new Promise((resolve, reject) => {
-//    mongoose.connect(databaseUrl, err => {
-//      if (err) {
-//        return reject(err);
-//      }
-//      resolve();
-//    });
-//   })
-//   .then(() => {
-//     server = app
-//     .listen(port, () => {
-//       console.log(`Your app is listening on port ${port}`);
-//     })
-//   },
-//   err => {
-//     mongoose.disconnect();
-//   });
-// }
-
-
 // close server
 function closeServer() {
   return mongoose.disconnect().then(()=> {
@@ -83,42 +63,9 @@ function closeServer() {
   });
 }
 
-// alternate way 1 of closing the server
-
-// function closeS1() {
-//   return new Promise((resolve, reject) => {
-//     mongoose.disconnect(() => {
-//       server.close(err => {
-//         if (err) {
-//           return reject(err);
-//         }
-//         console.log('Closing server!');
-//         resolve();
-//       })
-//     }); 
-//   });
-// }
-
-// alternate way 2 of closing the server
-
-// function closeS2() {
-//   return new Promise((resolve, reject) => {
-//     mongoose.disconnect((err) => {
-//         if (err) {
-//           return reject(err);
-//         }
-//         resolve();
-//       })
-//       .then(()=> {
-//         server.close();
-//       },
-//       (err) => {
-//         console.error('There has been an error.');
-//       });
-//   });
-// }
-
 // start from the terminal
 if (require.main === module) {
   runServer(DATABASE_URL).catch(err => console.error(err));
 }
+
+module.exports = {app, runServer, closeServer};
