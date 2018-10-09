@@ -2,6 +2,9 @@
 const express = require('express');
 const router = express.Router();
 
+// init app server
+const app = express();
+
 // import mongoose
 const mongoose = require('mongoose');
 
@@ -76,8 +79,48 @@ router.post('/', (req, res) => {
 
 // UPDATE posts
 router.put('/:id', (req, res) => {
-// some code
+  if (req.params.id !== req.body.id) {
+    const message = `Request path id ${req.params.id} and request body id ${req.body.id} must match`;
+    console.error(message);
+    return res.status(400).json({message: message});
+  }
+
+  const toUpdate = {};
+  const updateableFields = ['title', 'content', 'author'];
+
+  updateableFields.forEach(field => {
+    if ((field in req.body)) {
+      if (field === 'author') {
+        validateRequiredFields(req, res, ['firstName', 'lastName'], req.body.author);
+      }
+      toUpdate[field] = req.body[field];
+    }
+
+    Post
+    .findByIdAndUpdate(req.params.id, {$set: toUpdate})
+    .then(post => res.status(200).end())
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({
+      message: 'Internal server error!'
+      });
+    });
+  });
 });
 
+// DELETE post
+router.delete('/:id', (req, res) => {
+  Post
+  .findByIdAndRemove(req.params.id)
+  .then((post) => res.status(204).end())
+  .catch(err => res.status(500).json({
+    message: 'Internal server error'
+  }))
+});
+
+// catch-all endpoint if client makes request to non-existent endpoint
+app.use("*", function(req, res) {
+  res.status(404).json({ message: "Not Found" });
+});
 
 module.exports = router;
