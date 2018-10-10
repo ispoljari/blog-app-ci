@@ -67,7 +67,7 @@ describe('Integration tests of the blog app api layer.', function() {
   })
 
   describe('GET endpoint', function() {
-    it('should return all existing restaurants', function() {
+    it('Should return all existing blog posts', function() {
       // strategy: 
       // 1) GET all posts by making an HTTP req. to server
       // 2) inspect if the response object has the right HTTP status and a min. length of 1
@@ -88,7 +88,7 @@ describe('Integration tests of the blog app api layer.', function() {
         })
     });
 
-    it('should return posts with right fields', function() {
+    it('Should return blog posts with required fields', function() {
       // strategy: GET all posts by making an HTTP request tot he server, and ensure they have the right keys
 
       let firstPostResponse;
@@ -115,6 +115,61 @@ describe('Integration tests of the blog app api layer.', function() {
           expect(firstPostResponse.content).to.equal(firstPostDirect.content);
 
           expect(firstPostResponse.author).to.equal(`${firstPostDirect.author.firstName} ${firstPostDirect.author.lastName}`);
+        })
+    });
+  });
+
+  describe('POST endpoint', function() {
+    it('Should add a new blog post', function() {
+      const newPost = generatePostData();
+      return chai.request(app)
+        .post('/posts')
+        .send(newPost)
+        .then(function(res) {
+          expect(res).to.have.status(201);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.include.keys('title', 'author', 'content')
+          expect(res.body.title).to.equal(newPost.title);
+          expect(res.body.content).to.equal(newPost.content);
+          expect(res.body.author).to.equal(`${newPost.author.firstName} ${newPost.author.lastName}`);
+
+          return Post.findById(res.body.id);
+        })
+        .then(function(post) {
+          expect(newPost.title).to.equal(post.title);
+          expect(newPost.content).to.equal(post.content);
+          expect(newPost.author.firstName).to.equal(post.author.firstName);
+          expect(newPost.author.lastName).to.equal(post.author.lastName);
+        });
+    });
+  });
+
+  describe('PUT endpoint', function() {
+    it('Should update blog post fields that are sent over HTTP', function() {
+      const updateData = {
+        title: 'babababab',
+        content: 'lalaalalal'
+      }
+
+      return Post
+        .findOne()
+        .then(function(post) {
+            updateData.id = post.id;
+            return post.id;
+        })
+        .then(function(id) {
+          return chai.request(app)
+            .put(`/posts/${id}`)
+            .send(updateData);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(200);
+          return Post.findById(updateData.id)
+        })
+        .then(function(post) {
+          expect(updateData.title).to.equal(post.title);
+          expect(updateData.content).to.equal(post.content);
         })
     });
   });
