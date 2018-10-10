@@ -31,13 +31,14 @@ let server;
 
 function runServer(databaseUrl, port = PORT) {
  return new Promise((resolve, reject) => {
-  mongoose.connect(databaseUrl, err => {
+  mongoose.connect(databaseUrl, {useNewUrlParser: true}, err => {
     if (err) {
       return reject(err);
     }
+    console.info(`Successfuly connected to database at ${databaseUrl}`);
     server = app
       .listen(port, () => {
-        console.log(`Your app is listening on port ${port}`);
+        console.info(`The server started listening on port ${port}!`);
         resolve();
       })
       .on('error', err => {
@@ -51,12 +52,13 @@ function runServer(databaseUrl, port = PORT) {
 // close server
 function closeServer() {
   return mongoose.disconnect().then(()=> {
+    console.info(`Successfuly disconnected from database!`);
     return new Promise((resolve, reject) => {
       server.close(err => {
         if (err) {
           return reject(err);
         }
-        console.log('Closing server!');
+        console.info('Closing server!');
         resolve();
       })
     })

@@ -22,7 +22,7 @@ const {app, runServer, closeServer} = require('../server');
 const {TEST_DATABASE_URL} = require('../config');
 
 function seedPostData() {
-  console.info('seeding restaurant data');
+  console.info('Seeding the database with test data...');
   const seedData = [];
 
   for (let i=1; i<=10; i++) {
@@ -44,11 +44,11 @@ function generatePostData() {
 }
 
 function tearDownDb() {
-  console.warn('Deleting database');
+  console.warn('Tearing down the database...');
   return mongoose.connection.dropDatabase();
 }
 
-describe('blog-app API layer integration tests', function() {
+describe('Integration tests of the blog app api layer.', function() {
   
   before(function() {
     return runServer(TEST_DATABASE_URL);
@@ -68,6 +68,12 @@ describe('blog-app API layer integration tests', function() {
 
   describe('GET endpoint', function() {
     it('should return all existing restaurants', function() {
+      // strategy: 
+      // 1) GET all posts by making an HTTP req. to server
+      // 2) inspect if the response object has the right HTTP status and a min. length of 1
+      // 3) retrieve the total number of posts directly from the database
+      // 4) compare if the number of posts retrieved directly from the database equals to the number of posts returned in the response object of the HTTP transaction
+
       let res;
       return chai.request(app)
         .get('/posts')
@@ -75,10 +81,40 @@ describe('blog-app API layer integration tests', function() {
           res = _res;
           expect(res).to.have.status(200);
           expect(res.body).to.have.lengthOf.at.least(1);
-          return Post.count();
+          return Post.countDocuments();
         })
         .then(function(count){
           expect(res.body).to.have.lengthOf(count);
+        })
+    });
+
+    it('should return posts with right fields', function() {
+      // strategy: GET all posts by making an HTTP request tot he server, and ensure they have the right keys
+
+      let firstPostResponse;
+      return chai.request(app)
+        .get('/posts')
+        .then(function(res) {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('array');
+          expect(res.body).to.have.lengthOf.at.least(1);
+
+          res.body.forEach(function(post) {
+            expect(post).to.be.a('object');
+            expect(post).to.include.keys('title', 'author', 'content');
+          });
+          firstPostResponse = res.body[0];
+          return Post.findById(firstPostResponse.id); 
+        })
+        .then(function(firstPostDirect) {
+          expect(firstPostResponse.id).to.equal(firstPostDirect.id);
+
+          expect(firstPostResponse.title).to.equal(firstPostDirect.title);
+
+          expect(firstPostResponse.content).to.equal(firstPostDirect.content);
+
+          expect(firstPostResponse.author).to.equal(`${firstPostDirect.author.firstName} ${firstPostDirect.author.lastName}`);
         })
     });
   });
