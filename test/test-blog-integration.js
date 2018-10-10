@@ -173,4 +173,26 @@ describe('Integration tests of the blog app api layer.', function() {
         })
     });
   });
+
+  describe('DELETE endpoint', function() {
+    it('Should delete a blog post with the corresponding ID', function() {
+      let post;
+      return Post
+        .findOne()
+        .then(function(_post) {
+          post = _post;
+        })
+        .then(function() {
+          return chai.request(app)
+            .delete(`/posts/${post.id}`);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(204);
+          return Post.findById(post.id);
+        })
+        .then(function(_post) {
+          expect(_post).to.be.null;
+        });
+    });
+  });
 });
