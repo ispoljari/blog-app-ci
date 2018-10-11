@@ -2,3 +2,10 @@ language: node_js
 node_js: node
 services:
 - mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: WJoBodnvtmd1D/OLR7KKnnSMuzdrn2SuPmFKEcfgk3YcDK7KTT7VC22Jd4cLrAuhfB+V7gWZQSjJoc1Bfze/LrUnCXbmT/4uFoSPFhhurD8X4sjLdNPxSIt+rPYX3aDxT0TX2h8OR7zYjsPCZlKEUOlglKxgf+w9XrkQf+M6ZPFoU1rkOTHRhJ+F3hqWts1h544rxsvlsG5IRGn5EggCD62HjZ+SDmNuNtDLgoDc3Vl+Va4P2gAKxD1dIpcsTcAIkxSboxjw4l+xSJl8sg3GmRhAn6xYJXkp1tmWMfVG6W9SMpWxC2lp9YrvPhyuMIV1VSy8CQhp3pV+U2keB0vyIPbBxbkDEdNbPLRnkOa6zmaBwb2Bdp/mx0LUhobaUGQzDrOgb0H0HllyUCTkqolXXtB07tSWInp1QwTOExGQFL4aQijE90RGPs27UOSIjmwA2GraPTgQQG4xYrpXR+ljFRGsUIOkk1BrHUxcvdKUpqq+sfDzUNrdHmJJD03+k8kLIWyKBxAwnK0hvh75JHdD8ZiA3r7CTDMf/i2Qzt6C5ZysInv3XP47YGsx0MHK3s5S/jMQWkDEJUuAzkQ+4brRpre4g73MtYtaI03AL4/6NILz+Mq7nAZ7cFLx9BzYrvbF33oV9Y55z4kZedVxmp6wCzfN5BWedT4z+gC+HWxkGjY=
+  app: enigmatic-refuge-40089
+  on:
+    repo: ispoljari/blog-app-ci
